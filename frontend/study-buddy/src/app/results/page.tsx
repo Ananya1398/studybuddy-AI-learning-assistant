@@ -1,0 +1,235 @@
+"use client";
+
+import type React from "react";
+
+import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  Download,
+  MessageSquare,
+  FileText,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
+import { ChatInterface } from "@/components/chat-interface";
+
+// Mock data for demonstration
+const mockTranscript = `
+Speaker 1: Welcome to our discussion on artificial intelligence and its impact on society.
+Speaker 2: Thank you for having me. It's an important topic that deserves attention.
+Speaker 1: Let's start with the basics. How would you define AI for our audience?
+Speaker 2: Artificial Intelligence refers to computer systems designed to perform tasks that typically require human intelligence. These include learning, reasoning, problem-solving, perception, and language understanding.
+Speaker 1: And how is AI currently being used in everyday applications?
+Speaker 2: AI is all around us. From voice assistants like Siri and Alexa to recommendation systems on streaming platforms and e-commerce sites. It's in our email spam filters, navigation apps, and increasingly in healthcare for diagnostics.
+`;
+
+const mockSummary = `
+This discussion explores artificial intelligence and its societal impact. The speakers define AI as computer systems designed to perform tasks requiring human intelligence, including learning, reasoning, and language understanding. They highlight AI's prevalence in everyday applications such as voice assistants, recommendation systems, email filters, navigation apps, and healthcare diagnostics. The conversation emphasizes AI's growing importance and integration into daily life.
+`;
+
+export default function ResultsPage() {
+  const searchParams = useSearchParams();
+  const filename = searchParams.get("filename") || "video";
+  const [activeTab, setActiveTab] = useState("transcript");
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handlePlayPause = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTime = Number.parseFloat(e.target.value);
+    setCurrentTime(newTime);
+    if (videoRef.current) {
+      videoRef.current.currentTime = newTime;
+    }
+  };
+
+  const downloadPDF = () => {
+    // In a real app, this would generate and download a PDF
+    alert("In a real application, this would download the summary as a PDF");
+  };
+
+  useEffect(() => {
+    // In a real app, we would fetch the actual transcript and summary data here
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="border-b">
+        <div className="container flex h-16 items-center justify-between">
+          <h1 className="text-2xl font-bold">Media Transcriber</h1>
+          <Button
+            variant="outline"
+            onClick={() => (window.location.href = "/")}
+          >
+            New Upload
+          </Button>
+        </div>
+      </header>
+
+      <main className="container py-8">
+        <h2 className="text-3xl font-bold mb-6">{filename}</h2>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-1 space-y-4">
+            <Card className="overflow-hidden">
+              <div className="relative bg-black aspect-video">
+                <video
+                  ref={videoRef}
+                  className="w-full h-full"
+                  src="/placeholder.svg?height=720&width=1280"
+                  poster="/placeholder.svg?height=720&width=1280"
+                  onTimeUpdate={handleTimeUpdate}
+                  onLoadedMetadata={handleLoadedMetadata}
+                />
+              </div>
+
+              <div className="p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    {formatTime(currentTime)} / {formatTime(duration)}
+                  </span>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="ghost" size="icon" onClick={handleMute}>
+                      {isMuted ? (
+                        <VolumeX className="h-5 w-5" />
+                      ) : (
+                        <Volume2 className="h-5 w-5" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handlePlayPause}
+                    >
+                      {isPlaying ? (
+                        <Pause className="h-5 w-5" />
+                      ) : (
+                        <Play className="h-5 w-5" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <input
+                  type="range"
+                  min="0"
+                  max={duration || 100}
+                  value={currentTime}
+                  onChange={handleSeek}
+                  className="w-full h-2 bg-muted rounded-full appearance-none cursor-pointer"
+                />
+              </div>
+            </Card>
+          </div>
+
+          <div className="lg:col-span-2">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger
+                  value="transcript"
+                  className="flex items-center gap-2"
+                >
+                  <FileText className="h-4 w-4" />
+                  <span>Transcript</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="summary"
+                  className="flex items-center gap-2"
+                >
+                  <FileText className="h-4 w-4" />
+                  <span>Summary</span>
+                </TabsTrigger>
+                <TabsTrigger value="chat" className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  <span>Chat</span>
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="transcript" className="mt-4">
+                <Card className="p-6">
+                  <div className="prose dark:prose-invert max-w-none">
+                    <h3 className="text-xl font-semibold mb-4">Transcript</h3>
+                    <div className="whitespace-pre-line">{mockTranscript}</div>
+                  </div>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="summary" className="mt-4">
+                <Card className="p-6">
+                  <div className="prose dark:prose-invert max-w-none">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl font-semibold">Summary</h3>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={downloadPDF}
+                        className="flex items-center gap-2"
+                      >
+                        <Download className="h-4 w-4" />
+                        <span>Download PDF</span>
+                      </Button>
+                    </div>
+                    <div className="whitespace-pre-line">{mockSummary}</div>
+                  </div>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="chat" className="mt-4">
+                <Card className="p-0 overflow-hidden">
+                  <ChatInterface summary={mockSummary} />
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
