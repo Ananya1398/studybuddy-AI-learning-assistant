@@ -15,8 +15,14 @@ import {
   Pause,
   Volume2,
   VolumeX,
+  GripVertical,
 } from "lucide-react";
 import { ChatInterface } from "@/components/chat-interface";
+import {
+  ResizablePanel,
+  ResizablePanelGroup,
+  ResizableHandle,
+} from "@/components/ui/resizable";
 
 // Mock data for demonstration
 const mockTranscript = `
@@ -35,12 +41,38 @@ This discussion explores artificial intelligence and its societal impact. The sp
 export default function ResultsPage() {
   const searchParams = useSearchParams();
   const filename = searchParams.get("filename") || "video";
+  const [fileURL, setFileURL] = useState<string>("");
   const [activeTab, setActiveTab] = useState("transcript");
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    // Load the file from IndexedDB when the page reloads
+    const loadFileFromDB = async () => {
+      const db = await window.indexedDB.open("fileDB", 1);
+      db.onupgradeneeded = (event) => {
+        const target = event.target as IDBOpenDBRequest;
+        target.result.createObjectStore("files");
+      };
+      db.onsuccess = () => {
+        const transaction = db.result.transaction("files", "readonly");
+        const store = transaction.objectStore("files");
+        const request = store.get("uploadedFile");
+        request.onsuccess = () => {
+          if (request.result) {
+            const newFile = new File([request.result], "lecture.mp4", {
+              type: "video/mp4",
+            });
+            setFileURL(URL.createObjectURL(newFile));
+          }
+        };
+      };
+    };
+    loadFileFromDB();
+  }, []);
 
   const handlePlayPause = () => {
     if (videoRef.current) {
@@ -109,24 +141,28 @@ export default function ResultsPage() {
         </div>
       </header>
 
-      <main className="container py-8">
+      <main className="m-4 py-8">
         <h2 className="text-3xl font-bold mb-6">{filename}</h2>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1 space-y-4">
-            <Card className="overflow-hidden">
-              <div className="relative bg-black aspect-video">
+        <ResizablePanelGroup
+          direction="horizontal"
+          className="min-h-[600px] rounded-lg border"
+        >
+          {/* Video Panel */}
+          <ResizablePanel defaultSize={60} minSize={30}>
+            <div className="h-full p-4 space-y-4">
+              <div className="relative bg-black aspect-video rounded-md overflow-hidden">
                 <video
                   ref={videoRef}
                   className="w-full h-full"
-                  src="/placeholder.svg?height=720&width=1280"
+                  src={fileURL.length > 0 ? fileURL : ""}
                   poster="/placeholder.svg?height=720&width=1280"
                   onTimeUpdate={handleTimeUpdate}
                   onLoadedMetadata={handleLoadedMetadata}
                 />
               </div>
 
-              <div className="p-4 space-y-2">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
                     {formatTime(currentTime)} / {formatTime(duration)}
@@ -162,73 +198,84 @@ export default function ResultsPage() {
                   className="w-full h-2 bg-muted rounded-full appearance-none cursor-pointer"
                 />
               </div>
-            </Card>
-          </div>
+            </div>
+          </ResizablePanel>
 
-          <div className="lg:col-span-2">
-            <Tabs
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="w-full"
-            >
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger
-                  value="transcript"
-                  className="flex items-center gap-2"
-                >
-                  <FileText className="h-4 w-4" />
-                  <span>Transcript</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="summary"
-                  className="flex items-center gap-2"
-                >
-                  <FileText className="h-4 w-4" />
-                  <span>Summary</span>
-                </TabsTrigger>
-                <TabsTrigger value="chat" className="flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  <span>Chat</span>
-                </TabsTrigger>
-              </TabsList>
+          <ResizableHandle withHandle>
+            <div className="h-full flex items-center justify-center">
+              <GripVertical className="h-4 w-4 text-muted-foreground" />
+            </div>
+          </ResizableHandle>
 
-              <TabsContent value="transcript" className="mt-4">
-                <Card className="p-6">
-                  <div className="prose dark:prose-invert max-w-none">
-                    <h3 className="text-xl font-semibold mb-4">Transcript</h3>
-                    <div className="whitespace-pre-line">{mockTranscript}</div>
-                  </div>
-                </Card>
-              </TabsContent>
+          {/* Content Panel */}
+          <ResizablePanel defaultSize={70} minSize={35}>
+            <div className="h-full p-4">
+              <Tabs
+                value={activeTab}
+                onValueChange={setActiveTab}
+                className="w-full"
+              >
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger
+                    value="transcript"
+                    className="flex items-center gap-2"
+                  >
+                    <FileText className="h-4 w-4" />
+                    <span>Transcript</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="summary"
+                    className="flex items-center gap-2"
+                  >
+                    <FileText className="h-4 w-4" />
+                    <span>Summary</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="chat" className="flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    <span>Chat</span>
+                  </TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="summary" className="mt-4">
-                <Card className="p-6">
-                  <div className="prose dark:prose-invert max-w-none">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-xl font-semibold">Summary</h3>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={downloadPDF}
-                        className="flex items-center gap-2"
-                      >
-                        <Download className="h-4 w-4" />
-                        <span>Download PDF</span>
-                      </Button>
+                <TabsContent value="transcript" className="mt-4">
+                  <Card className="p-6 h-[500px] overflow-y-auto">
+                    <div className="prose dark:prose-invert max-w-none">
+                      <h3 className="text-xl font-semibold mb-4">Transcript</h3>
+                      <div className="whitespace-pre-line">
+                        {mockTranscript}
+                      </div>
                     </div>
-                    <div className="whitespace-pre-line">{mockSummary}</div>
-                  </div>
-                </Card>
-              </TabsContent>
+                  </Card>
+                </TabsContent>
 
-              <TabsContent value="chat" className="mt-4">
-                <Card className="p-0 overflow-hidden">
-                  <ChatInterface summary={mockSummary} />
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
+                <TabsContent value="summary" className="mt-4">
+                  <Card className="p-6 h-[500px] overflow-y-auto">
+                    <div className="prose dark:prose-invert max-w-none">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-xl font-semibold">Summary</h3>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={downloadPDF}
+                          className="flex items-center gap-2"
+                        >
+                          <Download className="h-4 w-4" />
+                          <span>Download PDF</span>
+                        </Button>
+                      </div>
+                      <div className="whitespace-pre-line">{mockSummary}</div>
+                    </div>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="chat" className="mt-4">
+                  <Card className="p-0 overflow-hidden h-[500px]">
+                    <ChatInterface summary={mockSummary} />
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </main>
     </div>
   );

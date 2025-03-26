@@ -1,3 +1,4 @@
+// import { useState } from "react";
 import { Suspense } from "react";
 import { Upload } from "@/components/upload";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -7,7 +8,7 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="container flex h-16 items-center justify-between">
-          <h1 className="text-2xl font-bold">Media Transcriber</h1>
+          <h1 className="text-2xl font-bold">StudyBuddy</h1>
           <ThemeToggle />
         </div>
       </header>

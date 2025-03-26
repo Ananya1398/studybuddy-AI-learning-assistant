@@ -1,8 +1,6 @@
 "use client";
 
-import type React from "react";
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UploadIcon, File, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,15 +10,12 @@ import { cn } from "@/lib/utils";
 
 export function Upload() {
   const router = useRouter();
-  toast("Hello", {
-    description: "This is a toast message!",
-  });
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(true);
   };
@@ -29,30 +24,24 @@ export function Upload() {
     setIsDragging(false);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
 
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile.type.startsWith("video/")) {
-        setFile(droppedFile);
-      } else {
-        toast("Invalid file type", {
-          description: "Please upload a video file.",
-        });
-        // toast({
-        //   title: "Invalid file type",
-        //   description: "Please upload a video file.",
-        //   variant: "destructive",
-        // });
-      }
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile?.type.startsWith("video/")) {
+      setFile(droppedFile);
+    } else {
+      toast("Invalid file type", {
+        description: "Please upload a video file.",
+      });
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
     }
   };
 
@@ -64,36 +53,42 @@ export function Upload() {
     if (!file) return;
 
     setUploading(true);
-
-    // Simulate upload progress
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + 5;
-      });
-    }, 300);
+    setProgress(0);
 
     try {
-      // Simulate API call for processing
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      // Simulate upload progress
+      const uploadProgress = setInterval(() => {
+        setProgress((prev) => {
+          const newProgress = prev + 5;
+          if (newProgress >= 100) {
+            clearInterval(uploadProgress);
+            return 100;
+          }
+          return newProgress;
+        });
+      }, 300);
 
-      // Navigate to processing page with file info
+      // Simulate API call for processing
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const db = await window.indexedDB.open("fileDB", 1);
+      db.onsuccess = () => {
+        const transaction = db.result.transaction("files", "readwrite");
+        const store = transaction.objectStore("files");
+        store.put(file, "uploadedFile"); // Save file to IndexedDB
+      };
+
+      // setFileURL(URL.createObjectURL(file));
+
+      const fileURL = URL.createObjectURL(file);
+      localStorage.setItem("fileURL", fileURL);
       router.push(`/processing?filename=${encodeURIComponent(file.name)}`);
     } catch (error) {
       console.error(error);
       toast("Upload failed", {
         description: "There was an error uploading your video.",
       });
-      // toast({
-      //   title: "Upload failed",
-      //   description: "There was an error uploading your video.",
-      //   variant: "destructive",
-      // });
     } finally {
-      clearInterval(interval);
       setUploading(false);
     }
   };
