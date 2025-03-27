@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Media Transcriber",
+  title: "StudyBuddy",
   description: "Convert videos to transcripts and summaries",
 };
 
