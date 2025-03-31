@@ -1,0 +1,82 @@
+# Lecture Notes: Hash Tables and Performance Analysis
+
+## Introduction
+In this lecture, we will explore the performance implications of different hash table structures, focusing specifically on how the table size and collision resolution methods influence efficiency. We'll review concepts like load factors, open addressing, chaining, and their respective advantages and disadvantages.
+
+## Key Concepts
+
+### 1. Hash Tables
+- A **hash table** is a data structure that uses a hash function to map keys to positions in an array, allowing for efficient data retrieval.
+- The primary goal of a hash table is to achieve constant average time complexity for search operations, making it crucial to minimize collisions.
+
+### 2. Collision Resolution Techniques
+- **Open Addressing:** In this method, all elements are stored directly within the hash table. When a collision occurs, the algorithm probes for the next available slot in the hash table.
+  - **Linear Probing:** A simple form of open addressing where you check the next sequential slot until you find an empty one.
+
+- **Chaining:** This technique allows for multiple elements to be stored at the same position in the hash table using linked lists.
+  - Each index in the hash table points to a linked list where all colliding elements are stored.
+  
+### 3. Performance Implications
+- The performance of a hash table is significantly impacted by the chosen method of collision resolution and the table size.
+- When the load factor (the ratio of stored elements to table size) increases, the performance can degrade:
+  - **Open Addressing:** As the load factor approaches 1, the time complexity shifts from average constant time to linear time.
+  - **Chaining:** Allows load factors to exceed 1, as each index can store multiple elements in a list.
+
+## Load Factor
+- The **load factor (L)** is defined as:
+  \[
+  L = \frac{\text{Number of elements stored}}{\text{Size of the hash table}}
+  \]
+- Key points:
+  - For open addressing, the load factor should ideally be less than 1.
+  - For chaining, it can exceed 1, making it more flexible in terms of storage.
+
+## Analytical Formula for Performance
+- A simplified formula derived by Donald Luth helps calculate the expected number of comparisons when searching for an existing element in a hash table using open addressing:
+  \[
+  \text{Expected Comparisons} = 1 + \frac{1 + L}{2}
+  \]
+- This demonstrates that the first probe checks the initial index, and the average will be affected by the load factor.
+
+### Example Illustrations
+1. **Open Addressing:**
+   - Load factor of 0 = 1 probe (table empty).
+   - Load factor approaching 1 = potentially more than 1 probe, pushing performance toward linear time.
+
+2. **Chaining:**
+   - Allows a load factor greater than 1, storing additional elements efficiently in linked lists.
+   - If each linked list has, on average, L elements, the expected number of comparisons becomes:
+   \[
+   \text{Expected Comparisons} = 1 + \frac{L}{2}
+   \]
+
+### Example Scenario
+- Suppose we want to store \( n = 60,000 \) values in a hash table:
+  - **Open Addressing with Linear Probing:**
+    - For 2.5 average comparisons at a load factor of 0.75, we calculate the required table size as \( \text{Table Size} = \frac{60,000}{0.75} = 80,000 \).
+    
+  - **Chaining:**
+    - To achieve the same performance:
+      - Use \( 1 + L/2 = 2.5 \) which gives \( L = 2 \).
+      - For \( L = 2 \), table size required is \( \frac{60,000}{2} = 30,000 \).
+  
+### Storage Requirements Comparison
+- **Open Addressing:**
+  - Requires only enough space for the hash table and the elements stored (80,000 in our scenario).
+  
+- **Chaining:**
+  - Required memory includes both the hash table and additional references in linked lists. If using singly linked lists for 60,000 values:
+  - Total memory: \( 20,000 (\text{hash table}) + 120,000 (\text{nodes}) = 140,000 \) references.
+  
+## Summary
+- **Performance Comparison:**
+  - In terms of speed, chaining offers better handling of higher load factors compared to open addressing but requires more memory.
+  - Open addressing is more memory efficient but requires careful management of the size to maintain performance.
+  
+- **Key Takeaway:**
+  - When designing hash tables, prioritize the balance between performance (in terms of time complexity) and storage requirements based on expected load factors and data size.
+
+## Conclusion
+Through this lecture, we have established a foundational understanding of the impact of table size and method of collision resolution in hash tables on overall performance. Addressing these factors effectively is essential for designing efficient data structures capable of accommodating various data loads while ensuring operational efficiency.
+
+In the next lecture, we will delve into hash functions and their role in optimizing hash table performance. Thank you for your attention!

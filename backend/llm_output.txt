@@ -1,0 +1,107 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture Notes on Hash Tables</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        h1, h2, h3, h4 { color: #2c3e50; }
+        h1 { font-size: 24px; }
+        h2 { font-size: 20px; }
+        h3 { font-size: 18px; }
+        h4 { font-size: 16px; }
+        ul { padding-left: 20px; }
+    </style>
+</head>
+<body>
+
+<h1>Lecture Notes: Hash Tables</h1>
+
+<h2>Introduction</h2>
+<p>In this lecture, we discuss the impact of the size of hash tables on performance. We will explore concepts related to how elements are stored and retrieved and the implications of collision resolution methods on performance.</p>
+
+<h2>Key Concepts</h2>
+
+<h3>Collision Handling Methods</h3>
+<ul>
+    <li><strong>Open Addressing:</strong> Method to resolve collisions through probing; cannot have more elements than the table size.</li>
+    <li><strong>Chaining:</strong> Stores elements in linked lists at each index, allowing multiple elements to coexist at a single table location.</li>
+</ul>
+
+<h3>Design Decisions for Hash Tables</h3>
+<ul>
+    <li>Choice of collision resolution method (chaining vs. open addressing).</li>
+    <li>Size of the hash table relative to the expected load.</li>
+    <li>Selection of a good hash function to ensure uniform distribution of elements.</li>
+</ul>
+
+<h3>Load Factor</h3>
+<ul>
+    <li><strong>Definition:</strong> The number of elements in the hash table divided by the table size.</li>
+    <li>In open addressing, the load factor must be ≤ 1.</li>
+    <li>In chaining, load factor can exceed 1 due to linked list storage.</li>
+</ul>
+
+<h3>Performance Expectations</h3>
+<ul>
+    <li>When using open addressing with a high load factor, performance degrades to linear time.</li>
+    <li>A low load factor ensures near-constant time performance for searches.</li>
+    <li>Chaining generally provides better average case performance compared to open addressing.</li>
+</ul>
+
+<h3>Expected Number of Comparisons</h3>
+<ul>
+    <li>For open addressing and a load factor \( L \):
+        <ul>
+            <li>Expected comparisons: \( \frac{1 + (1 - L)}{1 - L} \)</li>
+            <li>If \( L = 0 \), expected probes = 1 (empty table).</li>
+            <li>If \( L \) approaches 1, expected probes approaches infinity — hence avoided in practice.</li>
+        </ul>
+    </li>
+    <li>For chaining:
+        <ul>
+            <li>Initial probe to check for a linked list, followed by measurements based on the length of the list.</li>
+            <li>Average comparisons: \( 1 + \frac{L}{2} \) where \( L \) is the load factor, indicating average length of linked lists.</li>
+        </ul>
+    </li>
+</ul>
+
+<h2>Examples</h2>
+
+<h3>Comparative Analysis</h3>
+<ul>
+    <li>For a hash table with open addressing at 90% capacity:
+        <ul>
+            <li>Average expected comparisons: 5.5.</li>
+        </ul>
+    </li>
+    <li>For chaining at 90% capacity:
+        <ul>
+            <li>Average expected comparisons: approximately 1.5, indicating better performance compared to open addressing.</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Storage Considerations</h3>
+<ul>
+    <li>Open addressing has a maximum size limit determined by the array size.</li>
+    <li>Chaining requires additional storage for linked lists, which can lead to greater memory utilization, but allows for greater data flexibility.</li>
+</ul>
+
+<h2>Exercise</h2>
+<p>Consider an open addressing hash table with 60,000 entries and a desired average of 2.5 comparisons. If a load factor of 0.75 is utilized, what size should the hash table be? Answer: 80,000. For chaining, if the same performance is desired:</p>
+<ul>
+    <li><strong>Required size:</strong> 20,000, with a load factor allowing for more than one item per hash slot.</li>
+    <li>Storage requirement for chaining is larger: 140,000 references (120,000 for linked lists plus 20,000 for the hash table).</li>
+</ul>
+
+<h2>Conclusion</h2>
+<p>While chaining provides better average-case performance, it requires more storage space compared to open addressing, which is more space-efficient but can face performance degradation at high load factors. Understanding these trade-offs is critical when designing efficient hash tables.</p>
+
+<p>In the next lecture, we will focus on different hashing functions to improve distribution in hash tables.</p>
+
+</body>
+</html>
+``` 
