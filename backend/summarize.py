@@ -2,8 +2,8 @@ import nltk
 from sentence_transformers import SentenceTransformer, util
 from transformers import T5ForConditionalGeneration, T5Tokenizer
 
-# nltk.download('punkt')
-
+nltk.download('punkt')
+nltk.download('punkt_tab')
 model = SentenceTransformer('all-MiniLM-L6-v2')
 tokenizer = T5Tokenizer.from_pretrained('t5-small', legacy=False)
 t5_model = T5ForConditionalGeneration.from_pretrained('t5-small')
