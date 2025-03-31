@@ -149,7 +149,7 @@ export default function ResultsPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="container flex h-16 items-center justify-between">
-          <h1 className="text-2xl font-bold">Media Transcriber</h1>
+          <h1 className="text-2xl font-bold">StudyBuddy</h1>
           <Button
             variant="outline"
             onClick={() => (window.location.href = "/")}
@@ -246,7 +246,7 @@ export default function ResultsPage() {
                     className="flex items-center gap-2"
                   >
                     <FileText className="h-4 w-4" />
-                    <span>Summary</span>
+                    <span>Notes</span>
                   </TabsTrigger>
                   <TabsTrigger value="chat" className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4" />
@@ -270,7 +270,9 @@ export default function ResultsPage() {
                   <Card className="p-6 h-[500px] overflow-y-auto">
                     <div className="prose dark:prose-invert max-w-none">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-xl font-semibold">Summary</h3>
+                        <h3 className="text-xl font-semibold">
+                          Summary & Notes
+                        </h3>
                         <Button
                           variant="outline"
                           size="sm"
