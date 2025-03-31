@@ -19,6 +19,40 @@ export default function ProcessingPage() {
     { id: 3, name: "Creating summary" },
   ];
 
+  const uploadVideo = async () => {
+    localStorage.removeItem("uploadResponse");
+    const file = localStorage.getItem("fileURL");
+
+    if (!file) {
+      alert("Please select a video file.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("video", file);
+
+    try {
+      const response = await fetch("http://localhost:5001/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        // setUploadStatus("Upload successful! Processing video...");
+        console.log("Upload successful! Processing video...");
+        const uploadResponse = await response.json();
+        console.log(uploadResponse);
+        localStorage.setItem("uploadResponse", JSON.stringify(uploadResponse));
+      } else {
+        // setUploadStatus("Upload failed. Please try again.");
+        console.error("Upload failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      // setUploadStatus("Error uploading file.");
+    }
+  };
+
   useEffect(() => {
     // Simulate processing steps
     const processVideo = async () => {

@@ -7,6 +7,9 @@ import { useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { downloadPdfFromHtml } from "../../helpers/markdown-to-pdf";
 import {
   Download,
   MessageSquare,
@@ -40,6 +43,7 @@ This discussion explores artificial intelligence and its societal impact. The sp
 
 export default function ResultsPage() {
   const searchParams = useSearchParams();
+  const [data, setData] = useState<any>(null);
   const filename = searchParams.get("filename") || "video";
   const [fileURL, setFileURL] = useState<string>("");
   const [activeTab, setActiveTab] = useState("transcript");
@@ -49,6 +53,23 @@ export default function ResultsPage() {
   const [duration, setDuration] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // load transcript and summary data from localStorage
+  useEffect(() => {
+    const fetchData = () => {
+      const storedData = localStorage.getItem("uploadResponse");
+      if (storedData) {
+        setData(JSON.parse(storedData));
+      }
+    };
+
+    fetchData(); // Load data on mount
+
+    // Optional: Detect localStorage updates (if set in another tab)
+    window.addEventListener("storage", fetchData);
+    return () => window.removeEventListener("storage", fetchData);
+  }, []);
+
+  // load video file from IndexedDB
   useEffect(() => {
     // Load the file from IndexedDB when the page reloads
     const loadFileFromDB = async () => {
@@ -119,13 +140,10 @@ export default function ResultsPage() {
   };
 
   const downloadPDF = () => {
-    // In a real app, this would generate and download a PDF
-    alert("In a real application, this would download the summary as a PDF");
+    downloadPdfFromHtml(
+      document.getElementById("lecture-notes-div")?.innerHTML
+    );
   };
-
-  useEffect(() => {
-    // In a real app, we would fetch the actual transcript and summary data here
-  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -155,7 +173,7 @@ export default function ResultsPage() {
                 <video
                   ref={videoRef}
                   className="w-full h-full"
-                  src={fileURL.length > 0 ? fileURL : ""}
+                  src={fileURL.length > 0 ? fileURL : "/placeholder.mp4"}
                   poster="/placeholder.svg?height=720&width=1280"
                   onTimeUpdate={handleTimeUpdate}
                   onLoadedMetadata={handleLoadedMetadata}
@@ -241,7 +259,8 @@ export default function ResultsPage() {
                     <div className="prose dark:prose-invert max-w-none">
                       <h3 className="text-xl font-semibold mb-4">Transcript</h3>
                       <div className="whitespace-pre-line">
-                        {mockTranscript}
+                        {/* {mockTranscript} */}
+                        {data ? data?.transcript?.text : "Loading..."}
                       </div>
                     </div>
                   </Card>
@@ -262,7 +281,16 @@ export default function ResultsPage() {
                           <span>Download PDF</span>
                         </Button>
                       </div>
-                      <div className="whitespace-pre-line">{mockSummary}</div>
+                      {/* <div
+                        className="whitespace-pre-line"
+                      >
+                        {data ? data.notes : "Loading..."}
+                      </div> */}
+                      <div id="lecture-notes-div" className="prose markdown">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {data ? data?.notes : "Loading..."}
+                        </ReactMarkdown>
+                      </div>
                     </div>
                   </Card>
                 </TabsContent>
