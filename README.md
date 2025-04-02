@@ -78,7 +78,7 @@ Study Buddy is an AI-powered educational tool that converts lecture videos into 
 1. Navigate to the frontend directory
 
    ```bash
-   cd frontend
+   cd frontend/study-buddy
    ```
 
 2. Install dependencies
@@ -92,9 +92,7 @@ Study Buddy is an AI-powered educational tool that converts lecture videos into 
 3. Start the development server
 
    ```bash
-   npm run dev
-   # or
-   yarn dev
+   npm start
    ```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
