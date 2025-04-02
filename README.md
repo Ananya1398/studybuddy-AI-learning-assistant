@@ -15,6 +15,14 @@ Study Buddy is an AI-powered educational tool that converts lecture videos into 
 - **Interactive Q&A** [In progress]: Ask questions about the lecture and receive contextually relevant answers
 - **User-Friendly Interface**: Access all features through an intuitive, responsive UI
 
+## Architecture
+
+![Architecture Diagram](./documents/architecture.png)
+
+## Demo
+
+[![Study Buddy Demo](https://img.youtube.com/vi/ti9medwwD8k/0.jpg)](https://www.youtube.com/watch?v=ti9medwwD8k)
+
 ## Technology Stack
 
 - **Frontend**: Next.js, React.js, Tailwind CSS
