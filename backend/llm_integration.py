@@ -5,11 +5,13 @@ client = openai.OpenAI(api_key="sk-proj-orrrMbqLz-jCPAHUSysmktvEQsWkG4EDlnklpr9z
 
 
 def generate_notes(transcript_text):
-    with open("outputs/llm_output.txt", "r") as file:
-        text = file.read()
-        print(text)
-        file.close()
-        return text
+
+    # TO AVOID API CALLS
+    # with open("outputs/llm_output.txt", "r") as file:
+    #     text = file.read()
+    #     print(text)
+    #     file.close()
+    #     return text
 
 
     response = client.chat.completions.create(
