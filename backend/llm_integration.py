@@ -1,17 +1,24 @@
 import openai
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
+openai_key = os.getenv("OPENAI_API_KEY")
 
-client = openai.OpenAI(api_key="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")
+if openai_key is None:
+    raise ValueError("OPENAI_API_KEY is not set")
+
+client = openai.OpenAI(api_key=openai_key)
 
 
 def generate_notes(transcript_text):
 
     # TO AVOID API CALLS
-    # with open("outputs/llm_output.txt", "r") as file:
-    #     text = file.read()
-    #     print(text)
-    #     file.close()
-    #     return text
+    with open("outputs/llm_output.txt", "r") as file:
+        text = file.read()
+        print(text)
+        file.close()
+        return text
 
 
     response = client.chat.completions.create(

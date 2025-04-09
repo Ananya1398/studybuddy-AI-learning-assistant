@@ -16,3 +16,4 @@ torch
 sentencepiece
 protobuf
 flask-cors
+python-dotenv
