@@ -2,13 +2,21 @@
 import { Suspense } from "react";
 import { Upload } from "@/components/upload";
 import { ThemeToggle } from "@/components/theme-toggle";
+import Image from "next/image";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="container flex h-16 items-center justify-between">
-          <h1 className="text-2xl font-bold">StudyBuddy</h1>
+            <Image
+              src="/logo.svg"
+              alt="StudyBuddy Logo"
+              width={64}
+              height={64}
+              className="h-64 w-64"
+            />
+  
           <ThemeToggle />
         </div>
       </header>

@@ -41,8 +41,8 @@ export function Upload() {
     setProgress(0);
     
     try {
-      const formData = new FormData();
-      formData.append("video", file);
+    const formData = new FormData();
+    formData.append("video", file);
 
       const response = await fetch("http://localhost:5004/upload", {
         method: "POST",
@@ -83,13 +83,13 @@ export function Upload() {
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
       if (file.type.startsWith("video/")) {
         setFile(file);
         handleFileUpload(file);
-      } else {
+    } else {
         toast.error("Please upload a video file");
       }
     }
@@ -199,26 +199,26 @@ export function Upload() {
   };
 
   return (
-    <div
-      className={cn(
+      <div
+        className={cn(
         "relative rounded-lg border-2 border-dashed p-12 text-center",
-        isDragging
-          ? "border-primary bg-primary/5"
-          : "border-muted-foreground/25",
+          isDragging
+            ? "border-primary bg-primary/5"
+            : "border-muted-foreground/25",
         uploading && "pointer-events-none opacity-50"
-      )}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
+        )}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
     >
-      <input
-        type="file"
+            <input
+              type="file"
         id="video-upload"
-        accept="video/*"
-        className="hidden"
-        onChange={handleFileChange}
+              accept="video/*"
+              className="hidden"
+              onChange={handleFileChange}
         disabled={uploading}
-      />
+            />
 
       {uploading ? (
         <div className="space-y-4">
@@ -228,8 +228,8 @@ export function Upload() {
           <div>
             <p className="text-sm text-muted-foreground">Uploading video...</p>
             <Progress value={progress} className="mt-2" />
-          </div>
-        </div>
+              </div>
+              </div>
       ) : (
         <label
           htmlFor="video-upload"
@@ -244,15 +244,15 @@ export function Upload() {
                 </span>
                 <button
                   type="button"
-                  onClick={(e) => {
+              onClick={(e) => {
                     e.preventDefault();
-                    removeFile();
-                  }}
+                removeFile();
+              }}
                   className="ml-2 rounded-full p-1 hover:bg-muted"
-                >
+            >
                   <X className="h-4 w-4" />
                 </button>
-              </div>
+          </div>
             ) : (
               <div className="flex flex-col items-center gap-2">
                 <UploadIcon className="h-8 w-8 text-primary" />
@@ -262,9 +262,9 @@ export function Upload() {
                     Supported formats: MP4, AVI, MOV (max 100MB)
                   </p>
                 </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
         </label>
       )}
     </div>

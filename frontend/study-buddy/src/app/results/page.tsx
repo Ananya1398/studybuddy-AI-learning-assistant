@@ -26,6 +26,7 @@ import {
   ResizablePanelGroup,
   ResizableHandle,
 } from "@/components/ui/resizable";
+import Image from "next/image";
 
 // Mock data for demonstration
 const mockTranscript = `
@@ -152,7 +153,13 @@ export default function ResultsPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="container flex h-16 items-center justify-between">
-          <h1 className="text-2xl font-bold">StudyBuddy</h1>
+        <Image
+              src="/logo.svg"
+              alt="StudyBuddy Logo"
+              width={64}
+              height={64}
+              className="h-64 w-64"
+            />
           <Button
             variant="outline"
             onClick={() => (window.location.href = "/")}
