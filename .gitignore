@@ -138,3 +138,12 @@ dist
 venv/
 outputs/
 cache/
+
+*.mp4
+*.mp3
+*.wav
+*.m4a
+*.mov
+*.avi
+*.mkv
+

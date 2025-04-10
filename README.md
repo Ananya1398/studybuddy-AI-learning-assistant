@@ -1,121 +1,121 @@
-# Study Buddy
+# Study Buddy - Video Processing Application
 
-A lecture summarization and question-answering system that transforms video lectures into accessible, interactive learning resources.
+A web application that processes educational videos to generate transcripts, summaries, and structured notes.
 
-## Overview
+## Project Structure
 
-Study Buddy is an AI-powered educational tool that converts lecture videos into searchable text, generates comprehensive summaries, creates structured lecture notes, and provides an interactive Q&A system based on lecture content. The platform helps students efficiently review and understand lecture material through a user-friendly interface.
+```
+.
+├── backend/              # Flask backend server
+│   ├── app.py           # Main Flask application
+│   ├── requirements.txt # Python dependencies
+│   └── ...
+├── frontend/            # Next.js frontend
+│   └── study-buddy/     # Next.js application
+└── README.md            # This file
+```
 
-## Features
-
-- **Video-to-Audio Conversion**: Upload lecture videos and automatically extract audio
-- **Speech-to-Text Transcription**: Generate accurate text transcripts from lecture audio using OpenAI's Whisper model
-- **Intelligent Summarization**: Create concise summaries from paraphrased sentences with relevance scoring
-- **Structured Lecture Notes**: Generate well-organized notes from lecture content
-- **Interactive Q&A** [In progress]: Ask questions about the lecture and receive contextually relevant answers
-- **User-Friendly Interface**: Access all features through an intuitive, responsive UI
-
-## Architecture
-
-![Architecture Diagram](./documents/architecture.png)
-
-## Demo
-
-[![Study Buddy Demo](https://img.youtube.com/vi/ti9medwwD8k/0.jpg)](https://www.youtube.com/watch?v=ti9medwwD8k)
-
-## Technology Stack
-
-- **Frontend**: Next.js, React.js, Tailwind CSS
-- **Backend**: Python Flask
-- **Video Processing**: Python moviepy
-- **Speech Recognition**: OpenAI Whisper
-- **Text Processing**: NLTK, T5 Tokenizer
-- **Summarization**: Cosine Similarity for text scoring
-- **Lecture Notes Generation**: OpenAI GPT-4o mini
-- **Question-Answering** (In progress): FLAN-T5-Large, Instructor XL embeddings for vector-based semantic search
-
-## System Requirements
-
-- Node.js 18+ (Frontend)
-- Python 3.8+ (Backend)
-- FFmpeg (for media processing)
-
-## Getting Started
+## Setup Instructions
 
 ### Backend Setup
 
-1. Navigate to the backend directory
-
+1. Navigate to the backend directory:
    ```bash
    cd backend
    ```
 
-2. Create and activate a virtual environment
-
+2. Create and activate a virtual environment:
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   source venv/bin/activate  # On Windows, use: venv\Scripts\activate
    ```
 
-3. Install dependencies
-
+3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-4. Install FFmpeg (required for audio processing)
+4. Install FFmpeg (required for video processing):
+   - **macOS**:
+     ```bash
+     # Install Homebrew if not already installed
+     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+     
+     # Install FFmpeg
+     brew install ffmpeg
+     ```
+   - **Linux**:
+     ```bash
+     # Ubuntu/Debian
+     sudo apt-get install ffmpeg
+     
+     # Fedora
+     sudo dnf install ffmpeg
+     ```
+   - **Windows**: Download from [FFmpeg website](https://ffmpeg.org/download.html)
 
-   ```bash
-   # macOS
-   brew install ffmpeg
-
-   # Ubuntu/Debian
-   sudo apt-get install ffmpeg
-
-   # Windows
-   # Download from https://ffmpeg.org/download.html
-   ```
-
-5. Run the Flask server
+5. Start the backend server:
    ```bash
    python app.py
    ```
+   The server will start on `http://localhost:5004`
 
 ### Frontend Setup
 
-1. Navigate to the frontend directory
-
+1. Navigate to the frontend directory:
    ```bash
    cd frontend/study-buddy
    ```
 
-2. Install dependencies
-
+2. Install dependencies:
    ```bash
    npm install
-   # or
-   yarn install
    ```
 
-3. Start the development server
-
+3. Start the development server:
    ```bash
-   npm start
+   npm run dev
    ```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Project Status
+## Port Configuration
 
-- [x] Video-to-audio conversion
-- [x] Speech-to-text transcription
-- [x] Summary and paraphrase generation
-- [x] Lecture notes generation
-- [x] Responsive UI development
-- [ ] Question-answering module (in progress)
+- Backend server runs on port `5004`
+- Frontend development server runs on port `3000`
 
-## Contributors
+Make sure both servers are running and accessible at their respective ports.
 
-- Akshay Chavan
-- Gaurav Tejwani
-- Ananya Asthana
+## Features
+
+- Video upload and processing
+- Real-time progress tracking
+- Audio extraction from videos
+- Transcript generation
+- Summary creation
+- Structured notes generation
+
+## Troubleshooting
+
+1. **FFmpeg not found error**:
+   - Ensure FFmpeg is installed correctly
+   - Verify FFmpeg is in your system PATH
+   - Restart the backend server after installation
+
+2. **Connection refused errors**:
+   - Verify both frontend and backend servers are running
+   - Check that the backend is running on port 5004
+   - Ensure no other services are using the required ports
+
+3. **Upload failures**:
+   - Check file size (max 100MB)
+   - Verify file format (supported: MP4, AVI, MOV)
+   - Ensure proper permissions in upload/output directories
+
+## Development Notes
+
+- Backend uses Flask with CORS enabled
+- Frontend uses Next.js with TypeScript
+- Status tracking implemented via status files
+- Progress updates every 2 seconds
+- Results are cached for faster subsequent processing

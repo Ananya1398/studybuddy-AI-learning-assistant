@@ -71,26 +71,47 @@ export default function ResultsPage() {
 
   // load video file from IndexedDB
   useEffect(() => {
-    // Load the file from IndexedDB when the page reloads
     const loadFileFromDB = async () => {
-      const db = await window.indexedDB.open("fileDB", 1);
-      db.onupgradeneeded = (event) => {
-        const target = event.target as IDBOpenDBRequest;
-        target.result.createObjectStore("files");
-      };
-      db.onsuccess = () => {
-        const transaction = db.result.transaction("files", "readonly");
-        const store = transaction.objectStore("files");
-        const request = store.get("uploadedFile");
-        request.onsuccess = () => {
-          if (request.result) {
-            const newFile = new File([request.result], "lecture.mp4", {
-              type: "video/mp4",
-            });
-            setFileURL(URL.createObjectURL(newFile));
+      try {
+        const dbRequest = window.indexedDB.open("fileDB", 1);
+        
+        dbRequest.onerror = (event) => {
+          console.error("Database error:", event);
+        };
+
+        dbRequest.onupgradeneeded = (event) => {
+          const db = (event.target as IDBOpenDBRequest).result;
+          if (!db.objectStoreNames.contains("files")) {
+            db.createObjectStore("files");
           }
         };
-      };
+
+        dbRequest.onsuccess = (event) => {
+          const db = (event.target as IDBOpenDBRequest).result;
+          try {
+            const transaction = db.transaction("files", "readonly");
+            const store = transaction.objectStore("files");
+            const request = store.get("uploadedFile");
+
+            request.onsuccess = () => {
+              if (request.result) {
+                const newFile = new File([request.result], "lecture.mp4", {
+                  type: "video/mp4",
+                });
+                setFileURL(URL.createObjectURL(newFile));
+              }
+            };
+
+            request.onerror = (event) => {
+              console.error("Error reading file from IndexedDB:", event);
+            };
+          } catch (error) {
+            console.error("Transaction error:", error);
+          }
+        };
+      } catch (error) {
+        console.error("IndexedDB error:", error);
+      }
     };
     loadFileFromDB();
   }, []);

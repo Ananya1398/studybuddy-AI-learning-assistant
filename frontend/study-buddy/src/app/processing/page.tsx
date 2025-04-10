@@ -4,6 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
+
+interface ProcessingStatus {
+  status: string;
+  step: string;
+  progress: number;
+  error?: string;
+}
 
 export default function ProcessingPage() {
   const router = useRouter();
@@ -12,80 +20,74 @@ export default function ProcessingPage() {
 
   const [currentStep, setCurrentStep] = useState(1);
   const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   const steps = [
-    { id: 1, name: "Converting video to audio" },
-    { id: 2, name: "Generating transcript" },
-    { id: 3, name: "Creating summary" },
+    { id: 1, name: "Converting video to audio", status: "converting" },
+    { id: 2, name: "Generating transcript", status: "transcribing" },
+    { id: 3, name: "Creating summary", status: "summarizing" },
   ];
 
-  const uploadVideo = async () => {
-    localStorage.removeItem("uploadResponse");
-    const file = localStorage.getItem("fileURL");
-
-    if (!file) {
-      alert("Please select a video file.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("video", file);
-
-    try {
-      const response = await fetch("http://localhost:5001/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        // setUploadStatus("Upload successful! Processing video...");
-        console.log("Upload successful! Processing video...");
-        const uploadResponse = await response.json();
-        console.log(uploadResponse);
-        localStorage.setItem("uploadResponse", JSON.stringify(uploadResponse));
-      } else {
-        // setUploadStatus("Upload failed. Please try again.");
-        console.error("Upload failed. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      // setUploadStatus("Error uploading file.");
-    }
-  };
-
   useEffect(() => {
-    // Simulate processing steps
-    const processVideo = async () => {
-      // Step 1: Convert to audio
-      for (let i = 0; i <= 100; i += 5) {
-        setProgress(i);
-        await new Promise((r) => setTimeout(r, 100));
+    const checkStatus = async () => {
+      try {
+        const response = await fetch(`http://localhost:5004/status/${encodeURIComponent(filename)}`);
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch status");
+        }
+
+        const status: ProcessingStatus = await response.json();
+
+        // Update progress based on status
+        if (status.error) {
+          setError(status.error);
+          toast.error(status.error);
+          return;
+        }
+
+        // Map backend status to step number
+        let stepNumber = 1;
+        if (status.step === "transcribing") stepNumber = 2;
+        if (status.step === "summarizing") stepNumber = 3;
+        if (status.status === "completed") {
+          // Navigate to results page
+          router.push(`/results?filename=${encodeURIComponent(filename)}`);
+          return;
+        }
+
+        setCurrentStep(stepNumber);
+        setProgress(status.progress || 0);
+
+      } catch (error) {
+        console.error("Error checking status:", error);
+        toast.error("Failed to check processing status");
       }
-
-      setCurrentStep(2);
-      setProgress(0);
-
-      // Step 2: Generate transcript
-      for (let i = 0; i <= 100; i += 2) {
-        setProgress(i);
-        await new Promise((r) => setTimeout(r, 150));
-      }
-
-      setCurrentStep(3);
-      setProgress(0);
-
-      // Step 3: Create summary
-      for (let i = 0; i <= 100; i += 3) {
-        setProgress(i);
-        await new Promise((r) => setTimeout(r, 120));
-      }
-
-      // Navigate to results page
-      router.push(`/results?filename=${encodeURIComponent(filename)}`);
     };
 
-    processVideo();
+    // Check status every 2 seconds
+    const statusInterval = setInterval(checkStatus, 2000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(statusInterval);
   }, [filename, router]);
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="max-w-md w-full p-6 space-y-8 text-center">
+          <h1 className="text-2xl font-bold text-red-500">Processing Error</h1>
+          <p className="text-muted-foreground">{error}</p>
+          <button
+            onClick={() => router.push("/")}
+            className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
@@ -152,7 +154,7 @@ export default function ProcessingPage() {
                 <div className="space-y-1">
                   <Progress value={progress} className="h-2" />
                   <p className="text-xs text-right text-muted-foreground">
-                    {progress}%
+                    {Math.round(progress)}%
                   </p>
                 </div>
               )}
