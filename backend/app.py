@@ -154,6 +154,17 @@ def get_status(filename):
             "error": str(e)
         }), 500
 
+@app.route("/uploads/<filename>", methods=["GET"])
+def serve_video(filename):
+    """Serve the uploaded video file."""
+    try:
+        video_path = os.path.join(UPLOAD_FOLDER, filename)
+        if not os.path.exists(video_path):
+            return jsonify({"error": "Video not found"}), 404
+        return send_file(video_path)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == "__main__":
     print(f"🚀 Server running on http://127.0.0.1:{PORT}")
     app.run(host="0.0.0.0", port=PORT, debug=True)

@@ -69,52 +69,34 @@ export default function ResultsPage() {
     return () => window.removeEventListener("storage", fetchData);
   }, []);
 
-  // load video file from IndexedDB
+  // load video file from backend
   useEffect(() => {
-    const loadFileFromDB = async () => {
+    const loadVideo = async () => {
       try {
-        const dbRequest = window.indexedDB.open("fileDB", 1);
-        
-        dbRequest.onerror = (event) => {
-          console.error("Database error:", event);
-        };
-
-        dbRequest.onupgradeneeded = (event) => {
-          const db = (event.target as IDBOpenDBRequest).result;
-          if (!db.objectStoreNames.contains("files")) {
-            db.createObjectStore("files");
-          }
-        };
-
-        dbRequest.onsuccess = (event) => {
-          const db = (event.target as IDBOpenDBRequest).result;
-          try {
-            const transaction = db.transaction("files", "readonly");
-            const store = transaction.objectStore("files");
-            const request = store.get("uploadedFile");
-
-            request.onsuccess = () => {
-              if (request.result) {
-                const newFile = new File([request.result], "lecture.mp4", {
-                  type: "video/mp4",
-                });
-                setFileURL(URL.createObjectURL(newFile));
-              }
-            };
-
-            request.onerror = (event) => {
-              console.error("Error reading file from IndexedDB:", event);
-            };
-          } catch (error) {
-            console.error("Transaction error:", error);
-          }
-        };
+        const response = await fetch(`http://localhost:5004/uploads/${encodeURIComponent(filename)}`);
+        if (response.ok) {
+          const blob = await response.blob();
+          const videoUrl = URL.createObjectURL(blob);
+          setFileURL(videoUrl);
+        } else {
+          console.error("Failed to load video:", response.statusText);
+        }
       } catch (error) {
-        console.error("IndexedDB error:", error);
+        console.error("Error loading video:", error);
       }
     };
-    loadFileFromDB();
-  }, []);
+
+    if (filename) {
+      loadVideo();
+    }
+
+    // Cleanup function to revoke object URL
+    return () => {
+      if (fileURL) {
+        URL.revokeObjectURL(fileURL);
+      }
+    };
+  }, [filename]);
 
   const handlePlayPause = () => {
     if (videoRef.current) {
