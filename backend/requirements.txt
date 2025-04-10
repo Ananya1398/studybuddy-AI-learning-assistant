@@ -17,3 +17,5 @@ sentencepiece
 protobuf
 flask-cors
 python-dotenv
+openai
+huggingface_hub[hf_xet]
