@@ -64,9 +64,17 @@ class ChatService:
         conversation_chain = self.text_conversation_chains[text_id]
         response = conversation_chain({"question": question})
         
+        # Convert messages to serializable format
+        chat_history = []
+        for message in response["chat_history"]:
+            chat_history.append({
+                "role": message.type,
+                "content": message.content
+            })
+        
         return {
             "answer": response["answer"],
-            "chat_history": response["chat_history"]
+            "chat_history": chat_history
         }
 
     def delete_text(self, text_id):
