@@ -20,7 +20,7 @@ import {
   VolumeX,
   GripVertical,
 } from "lucide-react";
-import { ChatInterface } from "@/components/chat-interface";
+import ChatInterface from "@/components/ChatInterface";
 import {
   ResizablePanel,
   ResizablePanelGroup,
@@ -309,7 +309,10 @@ export default function ResultsPage() {
 
                 <TabsContent value="chat" className="mt-4">
                   <Card className="p-0 overflow-hidden h-[500px]">
-                    <ChatInterface summary={mockSummary} />
+                    <ChatInterface 
+                      textId={filename} 
+                      initialText={data?.transcript?.text || ""} 
+                    />
                   </Card>
                 </TabsContent>
               </Tabs>

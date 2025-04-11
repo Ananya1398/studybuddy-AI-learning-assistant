@@ -1,19 +1,21 @@
 from langchain.text_splitter import CharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceInstructEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain_community.llms import HuggingFaceHub
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+os.environ["HUGGINGFACEHUB_API_TOKEN"] = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 
 class ChatService:
     def __init__(self):
         self.text_vectorstores = {}
         self.text_conversation_chains = {}
-        self.embeddings = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-mpnet-base-v2",
-            model_kwargs={"device": "cpu"}
-        )
+        self.embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
         
     def get_text_chunks(self, text):
         """Split text into chunks for processing"""

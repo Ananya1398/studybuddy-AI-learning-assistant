@@ -1,10 +1,23 @@
 import whisper
+import os
 import json
 
-model = whisper.load_model("base")
-
 def transcribe_audio(audio_path):
-    return model.transcribe(audio_path)
+    """Transcribe audio file using Whisper"""
+    try:
+        # Load the Whisper model
+        model = whisper.load_model("base")
+        
+        # Transcribe the audio
+        result = model.transcribe(audio_path)
+        
+        return {
+            "text": result["text"],
+            "segments": result["segments"]
+        }
+    except Exception as e:
+        print(f"Error in transcription: {str(e)}")
+        return {"error": str(e)}
 
 def transcribe_audio_timestamped(audio_path):
     result = model.transcribe(audio_path, word_timestamps=True)

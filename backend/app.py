@@ -166,17 +166,17 @@ def serve_video(filename):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/chat/setup", methods=["POST"])
-def setup_chat():
-    """Initialize chat with processed text"""
+@app.route("/chat/process", methods=["POST"])
+def process_text():
+    """Process text for chat interaction"""
     try:
         data = request.get_json()
         text_id = data.get("text_id")
         text = data.get("text")
-
+        
         if not text_id or not text:
             return jsonify({"error": "text_id and text are required"}), 400
-
+            
         result = chat_service.process_text(text_id, text)
         return jsonify(result), 200
     except Exception as e:
@@ -184,45 +184,32 @@ def setup_chat():
 
 @app.route("/chat/ask", methods=["POST"])
 def ask_question():
-    """Ask a question about the processed text"""
+    """Ask a question about processed text"""
     try:
         data = request.get_json()
         text_id = data.get("text_id")
         question = data.get("question")
-
+        
         if not text_id or not question:
             return jsonify({"error": "text_id and question are required"}), 400
-
+            
         result = chat_service.ask_question(text_id, question)
         return jsonify(result), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @app.route("/chat/delete", methods=["POST"])
-def delete_chat():
-    """Delete chat history and associated data"""
+def delete_text():
+    """Delete processed text"""
     try:
         data = request.get_json()
         text_id = data.get("text_id")
-
+        
         if not text_id:
             return jsonify({"error": "text_id is required"}), 400
-
+            
         result = chat_service.delete_text(text_id)
         return jsonify(result), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route("/chat/text/<text_id>", methods=["GET"])
-def get_text(text_id):
-    """Get the text content for a given text_id"""
-    try:
-        # In a real application, you would fetch this from a database
-        # For now, we'll return a placeholder
-        return jsonify({
-            "text_id": text_id,
-            "text": "This is a placeholder text. In a real application, this would be fetched from a database."
-        }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
