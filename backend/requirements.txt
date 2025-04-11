@@ -20,10 +20,16 @@ python-dotenv>=1.0.0
 huggingface_hub[hf_xet]>=0.14.1
 
 # Core dependencies
-langchain>=0.0.184
+langchain>=0.1.0
 openai>=0.27.6
 faiss-cpu>=1.7.4
 altair>=4.0.0
 tiktoken>=0.4.0
 InstructorEmbedding>=1.0.1
 langchain-huggingface>=0.1.2
+
+# Chat feature dependencies
+langchain-community>=0.0.10
+langchain-core>=0.1.10
+langchain-text-splitters>=0.0.1
+langchain-openai>=0.0.2
