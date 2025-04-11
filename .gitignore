@@ -138,6 +138,7 @@ dist
 venv/
 outputs/
 cache/
+venv_new/
 
 *.mp4
 *.mp3
