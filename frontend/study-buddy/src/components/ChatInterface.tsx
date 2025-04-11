@@ -1,7 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ChatService, ChatResponse } from '@/lib/chatService';
+import { ChatService, ChatResponse, ChatError } from '@/lib/chatService';
+import { Avatar } from '@/components/ui/avatar';
+
+interface ChatMessage {
+  content: string;
+  role: 'human' | 'ai';
+}
 
 interface ChatInterfaceProps {
   textId: string;
@@ -10,7 +16,7 @@ interface ChatInterfaceProps {
 
 export default function ChatInterface({ textId, initialText }: ChatInterfaceProps) {
   const [question, setQuestion] = useState('');
-  const [chatHistory, setChatHistory] = useState<string[]>([]);
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +28,7 @@ export default function ChatInterface({ textId, initialText }: ChatInterfaceProp
         await ChatService.processText(textId, initialText);
         setError(null);
       } catch (err) {
-        setError('Failed to process text');
+        setError(err instanceof Error ? err.message : 'Failed to process text. Please try again.');
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -41,10 +47,14 @@ export default function ChatInterface({ textId, initialText }: ChatInterfaceProp
       setError(null);
       
       const response = await ChatService.askQuestion(textId, question);
+      if ('error' in response) {
+        setError(response.error);
+        return;
+      }
       setChatHistory(response.chat_history);
       setQuestion('');
     } catch (err) {
-      setError('Failed to get answer');
+      setError(err instanceof Error ? err.message : 'Failed to get answer. Please try again.');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -57,19 +67,63 @@ export default function ChatInterface({ textId, initialText }: ChatInterfaceProp
         {chatHistory.map((message, index) => (
           <div
             key={index}
-            className={`p-3 rounded-lg ${
-              index % 2 === 0
-                ? 'bg-blue-100 ml-auto'
-                : 'bg-gray-100 mr-auto'
-            } max-w-[80%]`}
+            className={`flex ${
+              message.role === 'human' ? 'justify-end' : 'justify-start'
+            }`}
           >
-            {message}
+            <div
+              className={`flex gap-3 max-w-[80%] ${
+                message.role === 'human' ? 'flex-row-reverse' : ''
+              }`}
+            >
+              <Avatar className="h-8 w-8">
+                {message.role === 'human' ? (
+                  <div className="bg-primary text-primary-foreground h-full w-full flex items-center justify-center text-sm font-medium">
+                    U
+                  </div>
+                ) : (
+                  <div className="bg-muted h-full w-full flex items-center justify-center text-sm font-medium">
+                    AI
+                  </div>
+                )}
+              </Avatar>
+              <div
+                className={`rounded-lg p-3 ${
+                  message.role === 'human'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted'
+                }`}
+              >
+                <p className="text-sm">{message.content}</p>
+              </div>
+            </div>
           </div>
         ))}
+
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="flex gap-3 max-w-[80%]">
+              <Avatar className="h-8 w-8">
+                <div className="bg-muted h-full w-full flex items-center justify-center text-sm font-medium">
+                  AI
+                </div>
+              </Avatar>
+              <div className="rounded-lg p-3 bg-muted">
+                <div className="flex space-x-2">
+                  <div className="h-2 w-2 rounded-full bg-current animate-bounce" />
+                  <div className="h-2 w-2 rounded-full bg-current animate-bounce [animation-delay:0.2s]" />
+                  <div className="h-2 w-2 rounded-full bg-current animate-bounce [animation-delay:0.4s]" />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {error && (
-        <div className="text-red-500 mb-4 text-center">{error}</div>
+        <div className="text-red-500 mb-4 text-center p-3 bg-red-50 rounded-lg">
+          {error}
+        </div>
       )}
 
       <form onSubmit={handleSubmit} className="flex gap-2">

@@ -1,8 +1,17 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004';
 
+export interface ChatMessage {
+  content: string;
+  role: 'human' | 'ai';
+}
+
+export interface ChatError {
+  error: string;
+}
+
 export interface ChatResponse {
   answer: string;
-  chat_history: string[];
+  chat_history: ChatMessage[];
 }
 
 export interface ProcessTextResponse {
@@ -27,7 +36,8 @@ export class ChatService {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to process text');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to process text');
       }
 
       return await response.json();
@@ -37,7 +47,7 @@ export class ChatService {
     }
   }
 
-  static async askQuestion(textId: string, question: string): Promise<ChatResponse> {
+  static async askQuestion(textId: string, question: string): Promise<ChatResponse | ChatError> {
     try {
       const response = await fetch(`${API_BASE_URL}/chat/ask`, {
         method: 'POST',
@@ -48,13 +58,14 @@ export class ChatService {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to ask question');
+        const errorData = await response.json();
+        return { error: errorData.error || 'Failed to ask question' };
       }
 
       return await response.json();
     } catch (error) {
       console.error('Error asking question:', error);
-      throw error;
+      return { error: 'Failed to ask question' };
     }
   }
 
@@ -69,7 +80,8 @@ export class ChatService {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete text');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete text');
       }
 
       return await response.json();
