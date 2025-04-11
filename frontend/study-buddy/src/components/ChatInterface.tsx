@@ -16,9 +16,23 @@ interface ChatInterfaceProps {
 
 export default function ChatInterface({ textId, initialText }: ChatInterfaceProps) {
   const [question, setQuestion] = useState('');
-  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>(() => {
+    // Initialize chat history from localStorage if it exists
+    if (typeof window !== 'undefined') {
+      const savedHistory = localStorage.getItem(`chat_history_${textId}`);
+      return savedHistory ? JSON.parse(savedHistory) : [];
+    }
+    return [];
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Save chat history to localStorage whenever it changes
+  useEffect(() => {
+    if (chatHistory.length > 0) {
+      localStorage.setItem(`chat_history_${textId}`, JSON.stringify(chatHistory));
+    }
+  }, [chatHistory, textId]);
 
   useEffect(() => {
     // Process the initial text when the component mounts
@@ -35,8 +49,11 @@ export default function ChatInterface({ textId, initialText }: ChatInterfaceProp
       }
     };
 
-    processInitialText();
-  }, [textId, initialText]);
+    // Only process text if we don't have any chat history
+    if (chatHistory.length === 0) {
+      processInitialText();
+    }
+  }, [textId, initialText, chatHistory.length]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
