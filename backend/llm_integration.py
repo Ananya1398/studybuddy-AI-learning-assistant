@@ -36,13 +36,11 @@ def generate_notes(text):
     try:
         # Create chat completion
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant that creates structured notes from text."},
-                {"role": "user", "content": f"Please create structured notes from this text:\n\n{text}"}
-            ],
-            temperature=0.7,
-            max_tokens=1500
+                {"role": "system", "content": "You are an AI that generates detailed, structured, and accurate lecture notes from transcriptions. Minimum 2-3 page response is required. The format must be markdown that can be embedded into a website. Add proper line breaks and bullet points for lists, subtopics, and lines to look it good. You may add information that is not present in the transcription, but ensure it is relevant and accurate."},
+                {"role": "user", "content": f"Generate detailed and structured lecture notes from the following transcription:\n{text}\n\nPlease follow these guidelines:\n- Organize the notes into clear sections (e.g., Introduction, Key Concepts, Examples, Summary).\n- Include definitions, explanations, and key points made by the lecturer.\n- Ensure the notes are comprehensive, accurate, and coherent.\n- Break down complex ideas into simpler terms.\n- Use bullet points for lists and subtopics.\n- If possible, highlight any key takeaways or important conclusions.\n- Maintain the authenticity of the information provided in the transcription."}
+            ]
         )
         
         # Extract the generated notes from the response
