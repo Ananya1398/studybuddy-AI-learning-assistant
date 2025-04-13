@@ -4,7 +4,7 @@ Study Buddy is an intelligent learning platform that helps students process and 
 
 ## Demo Video
 
-- [Watch the demo video here](./demo%20and%20screenshots/demo.mov)
+- [Watch the demo video here](https://youtu.be/lN99cJJFx7w)
 - [View screenshots](./demo%20and%20screenshots/)
 ## Features
 
