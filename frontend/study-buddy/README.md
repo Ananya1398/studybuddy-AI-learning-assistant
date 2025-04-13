@@ -1,36 +1,164 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Study Buddy - Frontend Component
 
-## Getting Started
+The frontend component of Study Buddy is built using Next.js and provides a modern, responsive user interface for interacting with the video processing and AI features.
 
-First, run the development server:
+## Architecture
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The frontend follows a component-based architecture with the following key features:
+
+- **Modern Stack**: Next.js, React, TypeScript
+- **Styling**: Tailwind CSS with custom components
+- **UI Components**: Radix UI for accessible components
+- **State Management**: React hooks and context
+- **API Integration**: Custom hooks for backend communication
+
+## Key Features
+
+### 1. Video Upload Interface
+- Drag-and-drop file upload
+- Progress tracking
+- File type validation
+- Preview capabilities
+
+### 2. Content Display
+- Transcript viewer
+- Summary display
+- Notes presentation
+- PDF export functionality
+
+### 3. Interactive Q&A
+- Chat interface
+- Real-time responses
+- Context-aware suggestions
+- History tracking
+
+### 4. User Interface
+- Responsive design
+- Dark/light mode
+- Accessible components
+- Loading states
+- Error handling
+
+## Project Structure
+
+```
+study-buddy/
+├── src/
+│   ├── components/     # Reusable UI components
+│   ├── pages/         # Next.js pages
+│   ├── hooks/         # Custom React hooks
+│   ├── styles/        # Global styles
+│   ├── types/         # TypeScript types
+│   └── utils/         # Utility functions
+├── public/            # Static assets
+└── package.json       # Dependencies
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup Instructions
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn package manager
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Installation
+1. Navigate to the project directory:
+   ```bash
+   cd frontend/study-buddy
+   ```
 
-## Learn More
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+3. Start the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Development
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Available Scripts
+- `npm run dev`: Start development server
+- `npm run build`: Build for production
+- `npm run start`: Start production server
+- `npm run lint`: Run ESLint
+- `npm run test`: Run tests
 
-## Deploy on Vercel
+### Code Style
+- Follow ESLint configuration
+- Use TypeScript for type safety
+- Follow component-based architecture
+- Implement responsive design
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Component Guidelines
+- Use functional components
+- Implement proper prop types
+- Follow accessibility guidelines
+- Use CSS modules or Tailwind
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## API Integration
+
+### Backend Communication
+- Custom hooks for API calls
+- Error handling
+- Loading states
+- Response caching
+
+### Environment Variables
+Create a `.env.local` file:
+```
+NEXT_PUBLIC_API_URL=http://localhost:5004
+```
+
+## Performance Optimization
+
+- Image optimization
+- Code splitting
+- Lazy loading
+- Caching strategies
+- Bundle size optimization
+
+## Testing
+
+### Unit Tests
+```bash
+npm test
+```
+
+### E2E Tests
+```bash
+npm run test:e2e
+```
+
+## Deployment
+
+### Production Build
+```bash
+npm run build
+```
+
+### Static Export
+```bash
+npm run export
+```
+
+## Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+
+## Accessibility
+
+- WCAG 2.1 compliance
+- Keyboard navigation
+- Screen reader support
+- ARIA attributes
+- Color contrast
+

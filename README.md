@@ -1,24 +1,54 @@
-# Study Buddy - Video Processing Application
+# Study Buddy - AI-Powered Learning Assistant
 
-A web application that processes educational videos to generate transcripts, summaries, and structured notes.
+Study Buddy is an intelligent learning platform that helps students process and understand educational content through AI-powered features. The application can process video lectures, generate summaries, create study notes, and provide interactive Q&A capabilities.
 
-## Project Structure
+## Features
 
-```
-.
-├── backend/              # Flask backend server
-│   ├── app.py           # Main Flask application
-│   ├── requirements.txt # Python dependencies
-│   └── ...
-├── frontend/            # Next.js frontend
-│   └── study-buddy/     # Next.js application
-└── README.md            # This file
-```
+### Core Features
+- **Video Processing**: Upload and process educational videos
+- **Audio Transcription**: Automatic transcription of video content
+- **Content Summarization**: AI-powered summarization of educational content
+- **Smart Notes Generation**: Automatic generation of structured study notes
+- **Interactive Q&A**: Chat-based interface for asking questions about the content
+- **PDF Export**: Export generated notes and summaries as PDF files
+
+### Technical Features
+- **Modern Frontend**: Built with Next.js, React, and Tailwind CSS
+- **AI Integration**: Leverages OpenAI and Hugging Face models
+- **Real-time Processing**: Asynchronous video and audio processing
+- **Caching System**: Efficient caching of processed content
+- **Responsive Design**: Works across desktop and mobile devices
+
+## System Architecture
+
+The application is built with a modern microservices architecture:
+
+![Study Buddy Architecture Diagram](study_buddy_architecture_diagram.png)
+
+### Frontend (Next.js)
+- Built with Next.js 15.2.3
+- React 19
+- Tailwind CSS for styling
+- Radix UI components
+- TypeScript support
+
+### Backend (Flask)
+- Python 3.x
+- Flask web framework
+- OpenAI integration
+- Hugging Face models
+- FFmpeg for video processing
+- Whisper for audio transcription
 
 ## Setup Instructions
 
-### Backend Setup
+### Prerequisites
+- Node.js (v18 or higher)
+- Python 3.8 or higher
+- FFmpeg installed on your system
+- OpenAI API key
 
+### Backend Setup
 1. Navigate to the backend directory:
    ```bash
    cd backend
@@ -27,7 +57,7 @@ A web application that processes educational videos to generate transcripts, sum
 2. Create and activate a virtual environment:
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows, use: venv\Scripts\activate
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 3. Install dependencies:
@@ -35,33 +65,18 @@ A web application that processes educational videos to generate transcripts, sum
    pip install -r requirements.txt
    ```
 
-4. Install FFmpeg (required for video processing):
-   - **macOS**:
-     ```bash
-     # Install Homebrew if not already installed
-     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-     
-     # Install FFmpeg
-     brew install ffmpeg
-     ```
-   - **Linux**:
-     ```bash
-     # Ubuntu/Debian
-     sudo apt-get install ffmpeg
-     
-     # Fedora
-     sudo dnf install ffmpeg
-     ```
-   - **Windows**: Download from [FFmpeg website](https://ffmpeg.org/download.html)
+4. Set up environment variables:
+   Create a `.env` file in the backend directory with:
+   ```
+   OPENAI_API_KEY=your_api_key_here
+   ```
 
 5. Start the backend server:
    ```bash
    python app.py
    ```
-   The server will start on `http://localhost:5004`
 
 ### Frontend Setup
-
 1. Navigate to the frontend directory:
    ```bash
    cd frontend/study-buddy
@@ -77,45 +92,41 @@ A web application that processes educational videos to generate transcripts, sum
    npm run dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+## API Endpoints
 
-## Port Configuration
+### Backend API
+- `POST /upload`: Upload and process video files
+- `GET /status/<filename>`: Check processing status
+- `GET /uploads/<filename>`: Serve uploaded videos
+- `POST /chat/process`: Process text for Q&A
+- `POST /chat/ask`: Ask questions about processed content
+- `POST /chat/delete`: Clear processed content
 
-- Backend server runs on port `5004`
-- Frontend development server runs on port `3000`
+## Development
 
-Make sure both servers are running and accessible at their respective ports.
+### Running Tests
+```bash
+# Backend tests
+cd backend
+python -m pytest
 
-## Features
+# Frontend tests
+cd frontend/study-buddy
+npm test
+```
 
-- Video upload and processing
-- Real-time progress tracking
-- Audio extraction from videos
-- Transcript generation
-- Summary creation
-- Structured notes generation
+### Building for Production
+```bash
+# Frontend build
+cd frontend/study-buddy
+npm run build
 
-## Troubleshooting
+# Backend deployment
+cd backend
+gunicorn app:app
+```
 
-1. **FFmpeg not found error**:
-   - Ensure FFmpeg is installed correctly
-   - Verify FFmpeg is in your system PATH
-   - Restart the backend server after installation
-
-2. **Connection refused errors**:
-   - Verify both frontend and backend servers are running
-   - Check that the backend is running on port 5004
-   - Ensure no other services are using the required ports
-
-3. **Upload failures**:
-   - Check file size (max 100MB)
-   - Verify file format (supported: MP4, AVI, MOV)
-   - Ensure proper permissions in upload/output directories
-
-## Development Notes
-
-- Backend uses Flask with CORS enabled
-- Frontend uses Next.js with TypeScript
-- Status tracking implemented via status files
-- Progress updates every 2 seconds
-- Results are cached for faster subsequent processing
+# Authors
+- [Akshay Chavan](https://www.linkedin.com/in/akshaychavan7/)
+- [Ananya Asthana](https://www.linkedin.com/in/ananyaasthana/)
+- [Gaurav Arun Tejwani](https://www.linkedin.com/in/gaurav-tejwani-758544270/)
