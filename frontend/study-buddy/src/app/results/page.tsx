@@ -297,7 +297,7 @@ export default function ResultsPage() {
                 <TabsContent value="transcript" className="mt-4">
                   <Card className="p-6 h-[500px] overflow-y-auto">
                     <div className="prose dark:prose-invert max-w-none">
-                      <h3 className="text-xl font-semibold mb-4">Transcript</h3>
+                      <h3 className="text-xl font-semibold mb-4">Full Transcript</h3>
                       <div className="whitespace-pre-line">
                         {data?.transcript?.segments ? (
                           data.transcript.segments.map((segment: any, index: number) => (

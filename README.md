@@ -2,6 +2,10 @@
 
 Study Buddy is an intelligent learning platform that helps students process and understand educational content through AI-powered features. The application can process video lectures, generate summaries, create study notes, and provide interactive Q&A capabilities.
 
+## Demo Video
+
+- [Watch the demo video here](./demo%20and%20screenshots/demo.mov)
+- [View screenshots](./demo%20and%20screenshots/)
 ## Features
 
 ### Core Features
