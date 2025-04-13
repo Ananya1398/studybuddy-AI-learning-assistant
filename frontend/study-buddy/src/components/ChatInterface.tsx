@@ -1,8 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChatService, ChatResponse, ChatError } from '@/lib/chatService';
 import { Avatar } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Loader2 } from 'lucide-react';
 
 interface ChatMessage {
   content: string;
@@ -26,6 +29,7 @@ export default function ChatInterface({ textId, initialText }: ChatInterfaceProp
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Save chat history to localStorage whenever it changes
   useEffect(() => {
@@ -33,6 +37,11 @@ export default function ChatInterface({ textId, initialText }: ChatInterfaceProp
       localStorage.setItem(`chat_history_${textId}`, JSON.stringify(chatHistory));
     }
   }, [chatHistory, textId]);
+
+  // Scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatHistory]);
 
   useEffect(() => {
     // Process the initial text when the component mounts
@@ -63,13 +72,26 @@ export default function ChatInterface({ textId, initialText }: ChatInterfaceProp
       setIsLoading(true);
       setError(null);
       
+      // Add user message to chat history
+      const userMessage: ChatMessage = {
+        content: question,
+        role: 'human'
+      };
+      setChatHistory(prev => [...prev, userMessage]);
+      setQuestion('');
+
       const response = await ChatService.askQuestion(textId, question);
       if ('error' in response) {
         setError(response.error);
         return;
       }
-      setChatHistory(response.chat_history);
-      setQuestion('');
+
+      // Add AI response to chat history
+      const aiMessage: ChatMessage = {
+        content: response.answer,
+        role: 'ai'
+      };
+      setChatHistory(prev => [...prev, aiMessage]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to get answer. Please try again.');
       console.error(err);
@@ -79,8 +101,14 @@ export default function ChatInterface({ textId, initialText }: ChatInterfaceProp
   };
 
   return (
-    <div className="flex flex-col h-full max-w-2xl mx-auto p-4">
-      <div className="flex-1 overflow-y-auto mb-4 space-y-4">
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {chatHistory.length === 0 && !isLoading && (
+          <div className="text-center text-muted-foreground">
+            Ask questions about the video content
+          </div>
+        )}
+        
         {chatHistory.map((message, index) => (
           <div
             key={index}
@@ -111,12 +139,11 @@ export default function ChatInterface({ textId, initialText }: ChatInterfaceProp
                     : 'bg-muted'
                 }`}
               >
-                <p className="text-sm">{message.content}</p>
+                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
               </div>
             </div>
           </div>
         ))}
-
         {isLoading && (
           <div className="flex justify-start">
             <div className="flex gap-3 max-w-[80%]">
@@ -126,39 +153,32 @@ export default function ChatInterface({ textId, initialText }: ChatInterfaceProp
                 </div>
               </Avatar>
               <div className="rounded-lg p-3 bg-muted">
-                <div className="flex space-x-2">
-                  <div className="h-2 w-2 rounded-full bg-current animate-bounce" />
-                  <div className="h-2 w-2 rounded-full bg-current animate-bounce [animation-delay:0.2s]" />
-                  <div className="h-2 w-2 rounded-full bg-current animate-bounce [animation-delay:0.4s]" />
-                </div>
+                <Loader2 className="h-4 w-4 animate-spin" />
               </div>
             </div>
           </div>
         )}
+        {error && (
+          <div className="text-center text-red-500 text-sm">
+            {error}
+          </div>
+        )}
+        <div ref={messagesEndRef} />
       </div>
 
-      {error && (
-        <div className="text-red-500 mb-4 text-center p-3 bg-red-50 rounded-lg">
-          {error}
+      <form onSubmit={handleSubmit} className="p-4 border-t">
+        <div className="flex gap-2">
+          <Input
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="Ask a question about the video..."
+            disabled={isLoading}
+            className="flex-1"
+          />
+          <Button type="submit" disabled={isLoading || !question.trim()}>
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send'}
+          </Button>
         </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <input
-          type="text"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Ask a question..."
-          className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          disabled={isLoading}
-        />
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
-        >
-          {isLoading ? 'Sending...' : 'Send'}
-        </button>
       </form>
     </div>
   );

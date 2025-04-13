@@ -51,6 +51,13 @@ export default function ProcessingPage() {
         if (status.step === "transcribing") stepNumber = 2;
         if (status.step === "summarizing") stepNumber = 3;
         if (status.status === "completed") {
+          // Get the final result from the backend
+          const resultResponse = await fetch(`http://localhost:5004/upload?filename=${encodeURIComponent(filename)}`);
+          if (resultResponse.ok) {
+            const resultData = await resultResponse.json();
+            // Store the result in localStorage
+            localStorage.setItem("uploadResponse", JSON.stringify(resultData));
+          }
           // Navigate to results page
           router.push(`/results?filename=${encodeURIComponent(filename)}`);
           return;

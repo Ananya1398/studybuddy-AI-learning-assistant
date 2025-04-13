@@ -52,14 +52,25 @@ export default function ResultsPage() {
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [currentSentence, setCurrentSentence] = useState<string>("");
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // load transcript and summary data from localStorage
   useEffect(() => {
     const fetchData = () => {
       const storedData = localStorage.getItem("uploadResponse");
+      console.log("Stored data from localStorage:", storedData);
+      
       if (storedData) {
-        setData(JSON.parse(storedData));
+        try {
+          const parsedData = JSON.parse(storedData);
+          console.log("Parsed data:", parsedData);
+          setData(parsedData);
+        } catch (error) {
+          console.error("Error parsing stored data:", error);
+        }
+      } else {
+        console.log("No data found in localStorage");
       }
     };
 
@@ -117,9 +128,23 @@ export default function ResultsPage() {
     }
   };
 
+  // Function to find the current sentence based on video time
+  const findCurrentSentence = (time: number) => {
+    if (!data?.transcript?.segments) return "";
+    
+    // Find the segment that contains the current time
+    const currentSegment = data.transcript.segments.find(
+      (segment: any) => time >= segment.start && time <= segment.end
+    );
+    
+    return currentSegment ? currentSegment.text : "";
+  };
+
   const handleTimeUpdate = () => {
     if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
+      const time = videoRef.current.currentTime;
+      setCurrentTime(time);
+      setCurrentSentence(findCurrentSentence(time));
     }
   };
 
@@ -225,6 +250,11 @@ export default function ResultsPage() {
                   onChange={handleSeek}
                   className="w-full h-2 bg-muted rounded-full appearance-none cursor-pointer"
                 />
+
+                {/* Current spoken sentence */}
+                <div className="mt-4 p-4 bg-muted rounded-md">
+                  <p className="text-center text-lg">{currentSentence || "No speech detected"}</p>
+                </div>
               </div>
             </div>
           </ResizablePanel>
@@ -269,8 +299,15 @@ export default function ResultsPage() {
                     <div className="prose dark:prose-invert max-w-none">
                       <h3 className="text-xl font-semibold mb-4">Transcript</h3>
                       <div className="whitespace-pre-line">
-                        {/* {mockTranscript} */}
-                        {data ? data?.transcript?.text : "Loading..."}
+                        {data?.transcript?.segments ? (
+                          data.transcript.segments.map((segment: any, index: number) => (
+                            <div key={index} className="mb-2">
+                              {segment.text}
+                            </div>
+                          ))
+                        ) : (
+                          <div>No transcript available</div>
+                        )}
                       </div>
                     </div>
                   </Card>
@@ -293,14 +330,9 @@ export default function ResultsPage() {
                           <span>Download PDF</span>
                         </Button>
                       </div>
-                      {/* <div
-                        className="whitespace-pre-line"
-                      >
-                        {data ? data.notes : "Loading..."}
-                      </div> */}
                       <div id="lecture-notes-div" className="prose markdown">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {data ? data?.notes : "Loading..."}
+                          {data?.notes || "No notes available"}
                         </ReactMarkdown>
                       </div>
                     </div>
@@ -311,7 +343,9 @@ export default function ResultsPage() {
                   <Card className="p-0 overflow-hidden h-[500px]">
                     <ChatInterface 
                       textId={filename} 
-                      initialText={data?.transcript?.text || ""} 
+                      initialText={data?.transcript?.segments ? 
+                        data.transcript.segments.map((segment: any) => segment.text).join(" ") 
+                        : ""} 
                     />
                   </Card>
                 </TabsContent>

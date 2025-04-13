@@ -166,6 +166,27 @@ def serve_video(filename):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/upload", methods=["GET"])
+def get_processed_data():
+    """Get the processed data for a given filename."""
+    try:
+        filename = request.args.get("filename")
+        if not filename:
+            return jsonify({"error": "Filename is required"}), 400
+
+        video_path = os.path.join(UPLOAD_FOLDER, filename)
+        if not os.path.exists(video_path):
+            return jsonify({"error": "Video not found"}), 404
+
+        # Get cached result
+        cached_result = cache_manager.get_cached_result(video_path)
+        if cached_result:
+            return jsonify(cached_result), 200
+
+        return jsonify({"error": "No processed data found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/chat/process", methods=["POST"])
 def process_text():
     """Process text for chat interaction"""
