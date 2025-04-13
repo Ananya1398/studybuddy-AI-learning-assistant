@@ -144,7 +144,6 @@ venv_new/
 *.mp3
 *.wav
 *.m4a
-*.mov
 *.avi
 *.mkv
 
